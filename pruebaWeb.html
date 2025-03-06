@@ -1,0 +1,276 @@
+<!-- <!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor de Texto de PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input {
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #output {
+            margin-block-start: 20px;
+            text-align: start;
+            max-inline-size: 600px;
+            margin-inline-start: auto;
+            margin-inline-end: auto;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>📄 Extractor de Texto de PDF</h2>
+    <p>Selecciona un archivo PDF para extraer su contenido.</p>
+
+    <label for="pdfFile">Seleccionar PDF:</label>
+    <input type="file" id="pdfFile" name="pdfFile" accept="application/pdf" title="Seleccione un archivo PDF">
+
+    <button onclick="uploadPDF()">🔍 Extraer Texto</button>
+
+    <h3>📜 Texto Extraído:</h3>
+    <div id="output"><pre>No hay texto aún...</pre></div>
+
+    <h3>📥 Descargar archivo extraído:</h3>
+    <a id="downloadLink" href="#" style="display: none;">Descargar Texto</a>
+
+    <script>
+        function uploadPDF() {
+            let fileInput = document.getElementById("pdfFile");
+            if (fileInput.files.length === 0) {
+                alert("Por favor, selecciona un archivo PDF.");
+                return;
+            }
+    
+            let formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+    
+            fetch("http://127.0.0.1:8000/extract-text/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Respuesta de la API:", data);
+    
+                if (data.document && data.document.extracted_text) {
+                    let output = document.getElementById("output");
+                    output.innerHTML = ""; // Limpiar contenido previo
+    
+                    // Mostrar texto extraído página por página
+                    data.document.extracted_text.forEach(page => {
+                        output.innerHTML += `<h4>📖 Página ${page.page}</h4><pre>${page.content}</pre>`;
+                    });
+    
+                    // Mostrar enlace de descarga del archivo extraído
+                    let downloadLink = document.getElementById("downloadLink");
+                    downloadLink.href = "http://127.0.0.1:8000" + data.download_link;
+                    downloadLink.style.display = "block";
+                    downloadLink.innerText = "📥 Descargar Texto Extraído";
+                } else {
+                    alert("❌ Error al procesar el archivo. No se recibió texto válido.");
+                }
+            })
+            .catch(error => {
+                console.error("Error en la petición:", error);
+                alert("❌ Ocurrió un error al comunicarse con la API.");
+            });
+        }
+    </script>
+    
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extractor de Texto de PDF</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, button {
+            margin: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #output {
+            margin-block-start: 20px;
+            text-align: start;
+            max-inline-size: 800px;
+            margin-inline-start: auto;
+            margin-inline-end: auto;
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        table {
+            inline-size: 100%;
+            border-collapse: collapse;
+            margin-block-start: 10px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 8px;
+            text-align: start;
+        }
+        th {
+            background-color: #ddd;
+        }
+        #downloadLink {
+            display: none;
+            margin-block-start: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>📄 Extractor de Texto de PDF</h2>
+    <p>Selecciona un archivo PDF para extraer su contenido.</p>
+
+    <label for="pdfFile">Seleccionar PDF:</label>
+    <input type="file" id="pdfFile" name="pdfFile" accept="application/pdf" title="Seleccione un archivo PDF">
+
+    <button onclick="uploadPDF()">🔍 Extraer Texto</button>
+
+    <h3>📜 Texto Extraído:</h3>
+    <div id="output"><pre>No hay texto aún...</pre></div>
+
+    <h3>📥 Descargar archivo extraído:</h3>
+    <a id="downloadLink" href="#" target="_blank">📥 Descargar Texto</a>
+
+    <script>
+        function uploadPDF() {
+            let fileInput = document.getElementById("pdfFile");
+            if (fileInput.files.length === 0) {
+                alert("Por favor, selecciona un archivo PDF.");
+                return;
+            }
+    
+            let formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+    
+            fetch("http://127.0.0.1:8000/extract-text/", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Respuesta de la API:", data);
+    
+                if (data.document && data.document.extracted_text.length > 0) {
+                    let output = document.getElementById("output");
+                    output.innerHTML = ""; // Limpiar contenido previo
+
+                    // Procesar cada página
+                    data.document.extracted_text.forEach(page => {
+                        let content = page.content;
+
+                        output.innerHTML += `<h3>📖 Página ${page.page}</h3>`;
+
+                        // Datos generales
+                        output.innerHTML += `
+                            <p><strong>📌 Acta:</strong> ${content.acta || "N/A"}</p>
+                            <p><strong>👤 Cliente:</strong> ${content.cliente || "N/A"}</p>
+                            <p><strong>📍 Dirección:</strong> ${content.direccion || "N/A"}</p>
+                            <p><strong>🏙️ Municipio:</strong> ${content.municipio || "N/A"}</p>
+                            <p><strong>📅 Fecha de Revisión:</strong> ${content.fecha_revision || "N/A"}</p>
+                            <p><strong>👨‍🔧 Inspector:</strong> ${content.inspector || "N/A"}</p>
+                        `;
+
+                        // Medidor instalado y retirado
+                        output.innerHTML += `
+                            <p><strong>🔄 Medidor Instalado:</strong> ${content.medidor_instalado || "N/A"}</p>
+                            <p><strong>🛠️ Medidor Retirado:</strong> ${content.medidor_retirado || "N/A"}</p>
+                        `;
+
+                        // Equipos revisados
+                        if (content.equipos_revisados && content.equipos_revisados.length > 0) {
+                            output.innerHTML += `<h4>⚡ Equipos Revisados:</h4><table><tr><th>Nombre</th><th>Cantidad</th><th>Potencia (W)</th><th>Uso</th></tr>`;
+                            content.equipos_revisados.forEach(equipo => {
+                                output.innerHTML += `<tr>
+                                    <td>${equipo.nombre}</td>
+                                    <td>${equipo.cantidad}</td>
+                                    <td>${equipo.potencia_w}</td>
+                                    <td>${equipo.uso}</td>
+                                </tr>`;
+                            });
+                            output.innerHTML += `</table>`;
+                        }
+
+                        // Sellos inspeccionados
+                        if (content.sellos && content.sellos.length > 0) {
+                            output.innerHTML += `<h4>🔍 Sellos Inspeccionados:</h4><table><tr><th>Tipo</th><th>Estado</th><th>Código</th><th>Color</th><th>Ubicación</th></tr>`;
+                            content.sellos.forEach(sello => {
+                                output.innerHTML += `<tr>
+                                    <td>${sello.tipo}</td>
+                                    <td>${sello.estado}</td>
+                                    <td>${sello.codigo}</td>
+                                    <td>${sello.color}</td>
+                                    <td>${sello.ubicacion}</td>
+                                </tr>`;
+                            });
+                            output.innerHTML += `</table>`;
+                        }
+
+                        // Situación encontrada y observaciones
+                        output.innerHTML += `
+                            <p><strong>⚠️ Situación Encontrada:</strong> ${content.situacion_encontrada || "N/A"}</p>
+                            <p><strong>📝 Observaciones:</strong> ${content.observaciones || "N/A"}</p>
+                        `;
+
+                        // Total de materiales
+                        output.innerHTML += `
+                            <p><strong>💰 Total de Materiales:</strong> ${content.total_materiales ? `$${content.total_materiales.toFixed(2)}` : "N/A"}</p>
+                        `;
+                    });
+
+                    // Mostrar enlace de descarga del archivo extraído
+                    let downloadLink = document.getElementById("downloadLink");
+                    downloadLink.href = "http://127.0.0.1:8000" + data.download_link;
+                    downloadLink.style.display = "block";
+                    downloadLink.innerText = "📥 Descargar Texto Extraído";
+                } else {
+                    alert("❌ Error al procesar el archivo. No se recibió texto válido.");
+                }
+            })
+            .catch(error => {
+                console.error("Error en la petición:", error);
+                alert("❌ Ocurrió un error al comunicarse con la API.");
+            });
+        }
+    </script>
+    
+</body>
+</html>
+
