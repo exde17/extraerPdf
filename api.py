@@ -35,13 +35,13 @@ def dynamic_parse_pdf_text(text: str) -> dict:
         if not line:
             continue
 
-        # Si la línea contiene ":" la tratamos como un posible par clave:valor
+        # Si la línea contiene ":" la trato como un posible par clave:valor
         if ':' in line:
             parts = line.split(':', 1)
             key = parts[0].strip().lower()  # normalizamos la clave
             value = parts[1].strip()
 
-            # Si ya existe la clave, convertimos el valor a lista para almacenar varios elementos
+            # Si ya existe la clave, convierto el valor a lista para almacenar varios elementos
             if key in extracted_data:
                 if isinstance(extracted_data[key], list):
                     extracted_data[key].append(value)
@@ -50,7 +50,7 @@ def dynamic_parse_pdf_text(text: str) -> dict:
             else:
                 extracted_data[key] = value
 
-            last_key = key  # Guardamos la clave actual para posibles líneas adicionales
+            last_key = key  # Guardo la clave actual para posibles líneas adicionales
         else:
             # Si no se encontró ":" y existe una clave previa, se concatena la línea al valor anterior
             if last_key:
